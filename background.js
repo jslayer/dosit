@@ -6,8 +6,19 @@ function getToday(){
     return [b.getDate(), b.getMonth(), b.getFullYear()].join('.')
 }
 
+function saveData(data) {
+    chrome.storage.sync.set(data, function(){
+    });
+}
+
 chrome.storage.sync.get('data', function(v_data){
-    v_data = v_data || {};
+    if (!v_data.data) {
+        v_data.data = {};
+    }
+
+    if (!v_data.selection) {
+        v_data.selection = [];
+    }
 
     setInterval(function(){
         chrome.tabs.query({
@@ -25,15 +36,15 @@ chrome.storage.sync.get('data', function(v_data){
                         if (focus) {
                             today = getToday();
 
-                            if (!v_data[today]) {
-                                v_data[today] = {};
+                            if (!v_data.data[today]) {
+                                v_data.data[today] = {};
                             }
 
-                            if (!v_data[today][response.host]) {
-                                v_data[today][response.host] = 0;
+                            if (!v_data.data[today][response.host]) {
+                                v_data.data[today][response.host] = 0;
                             }
 
-                            v_data[today][response.host]++;
+                            v_data.data[today][response.host]++;
                         }
                     }
                 });
@@ -42,24 +53,32 @@ chrome.storage.sync.get('data', function(v_data){
     }, 1000);
 
     setInterval(function(){
-        chrome.storage.sync.set(v_data, function(){
-        });
+        saveData(v_data);
     }, 10000);
 
     chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
             switch (request) {
                 case 'getData':
-                    sendResponse({
-                        data : v_data
-                    });
+                    sendResponse(v_data);
                     break;
                 case 'clearData':
                     chrome.storage.sync.clear(function(){
-                        v_data = {};
+                        v_data = {
+                            data : {},
+                            selection : []
+                        };
                         sendResponse('ok');
                     });
                     break;
                 default :
+                    if (request && request.request && request.data) {
+                        switch (request.request) {
+                            case 'saveSelection':
+                                v_data.selection = request.data;
+                                saveData(v_data);
+                                break;
+                        }
+                    }
             }
         }
     );
