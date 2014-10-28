@@ -1,0 +1,22 @@
+{
+    "name"             : "__MSG_appName__",
+    "description"      : "__MSG_appDescription__",
+    "version"          : "0.0.1",
+    "manifest_version" : 2,
+    "background"       : {
+        "page" : "background.html"
+    },
+    "options_page": "options.html",
+    "permissions"      : [
+        "storage", "tabs", "<all_urls>"
+    ],
+    "page_action"      : {
+        "default_title" : "__MSG_pageActionTitle__"
+    },
+    "content_scripts"  : [
+        {
+            "matches" : ["<all_urls>"],
+            "js"      : ["content_script.js"]
+        }
+    ]
+}
