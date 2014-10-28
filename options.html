@@ -5,13 +5,53 @@
     <title></title>
     <style type="text/css">
         body {
-            font: 13px Arial;
+            font: 15px Arial;
+        }
+
+        table {
+            width: 800px;
+            margin: 0 auto;
+        }
+
+        th {
+            color: #777;
+            font-size: 17px;
+            text-align: left;
+            border-bottom: 1px solid #777;
+            padding: 2px 4px;
+        }
+
+        td {
+            padding: 2px 4px;
+        }
+        
+        td.host {
+            color: #465ddd;
+            width: 400px;
+        }
+
+        tr:nth-child(odd) {
+            background: #fafaf0;
         }
     </style>
+    <script src="humanize-duration.js"></script>
     <script src="angular.min.js"></script>
     <script src="options.js"></script>
 </head>
 <body ng-controller="EnoughController">
-<pre>{{data | json}}</pre>
+<button type="button" ng-click="clearAction()">Clear</button>
+<!--<div>{{used | bytes}}</div>-->
+
+<table ng-repeat="(date, items) in data">
+    <tr>
+        <th colspan="2">{{date}}</th>
+    </tr>
+    <tr ng-repeat="(host, value) in items">
+        <td class="host">{{host}}</td>
+        <td title="{{value}}">{{value | humanizeDuration}}</td>
+    </tr>
+
+</table>
+
 </body>
 </html>

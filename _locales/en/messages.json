@@ -1,0 +1,12 @@
+{
+    "appName": {
+        "message": "Dosit' ",
+        "description": "Time management application"
+    },
+    "appDescription": {
+        "message": "Time management application"
+    },
+    "pageActionTitle" : {
+        "message" : "Dosit'"
+    }
+}
