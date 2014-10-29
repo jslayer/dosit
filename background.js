@@ -7,7 +7,7 @@ function getToday(){
     return b.getTime();
 }
 
-function saveData(data) {
+function saveData(data){
     chrome.storage.sync.set(data, function(){
     });
 }
@@ -47,6 +47,13 @@ chrome.storage.sync.get('data', function(v_data){
 
                             v_data.data[today][response.host]++;
                         }
+
+                        chrome.browserAction.setIcon({
+                            path  : v_data.selection.indexOf(host) > -1 ? 'icon128_4.png' : 'icon128.png',
+                            tabId : tab.id
+                        }, function(){
+                            console.log('icon changed', tab.id, host, v_data.selection);
+                        });
                     }
                 });
             });
@@ -65,7 +72,7 @@ chrome.storage.sync.get('data', function(v_data){
                 case 'clearData':
                     chrome.storage.sync.clear(function(){
                         v_data = {
-                            data : {},
+                            data      : {},
                             selection : []
                         };
                         sendResponse('ok');
