@@ -44,12 +44,22 @@
             font-size: 11px;
         }
 
+        th.good {
+            width: 48px;
+            font-size: 11px;
+        }
+
         tr:nth-child(odd) {
             background: #fafaf0;
         }
 
-        tr.important td {
+        tr.bs td {
             color: #ff1822;
+            font-weight: bold;
+        }
+
+        tr.gs td {
+            color: #159400;
             font-weight: bold;
         }
     </style>
@@ -65,11 +75,13 @@
 
 <table ng-repeat="(date, items) in data">
     <tr>
+        <th class="good">Good</th>
         <th class="bad">Bad</th>
         <th colspan="2">{{date | date : 'd MMMM yyyy'}}</th>
     </tr>
-    <tr ng-repeat="(host, value) in items" ng-class="selection.indexOf(host) > -1 && 'important'">
-        <td><input type="checkbox" ng-checked="selection.indexOf(host) > -1" ng-click="toggleSelectionAction(host)" /></td>
+    <tr ng-repeat="(host, value) in items" ng-class="(bs.indexOf(host) > -1 && 'bs') || (gs.indexOf(host) > -1 && 'gs')">
+        <td><input type="checkbox" ng-checked="gs.indexOf(host) > -1" ng-click="toggleGsAction(host)" /></td>
+        <td><input type="checkbox" ng-checked="bs.indexOf(host) > -1" ng-click="toggleBsAction(host)" /></td>
         <td class="host">{{host}}</td>
         <td ng-attr-title="{{value}}">{{value | duration}}</td>
     </tr>

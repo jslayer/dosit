@@ -23,32 +23,53 @@ angular.module('enoughApp', [])
     })
     .controller('EnoughController', ['$scope', '$interval', function($scope, $interval){
         $scope.data = {};
-        $scope.selection = [];
+        $scope.bs = [];
+        $scope.gs = [];
         $scope.used = 0;
         $scope.total = 0;
 
         $scope.clearAction = function(){
             $scope.data = {};
-            $scope.selection = {};
+            $scope.bs = {};
+            $scope.gs = {};
             chrome.extension.sendRequest(null, 'clearData', function(response){
             });
         };
 
-        $scope.toggleSelectionAction = function(host){
+        $scope.toggleBsAction = function(host){
             var ix;
 
-            ix = $scope.selection.indexOf(host);
+            ix = $scope.bs.indexOf(host);
 
             if (ix > -1) {
-                $scope.selection.splice(ix, 1);
+                $scope.bs.splice(ix, 1);
             }
             else {
-                $scope.selection.push(host);
+                $scope.bs.push(host);
             }
 
             chrome.extension.sendRequest(null, ({
-                request : 'saveSelection',
-                data    : $scope.selection
+                request : 'saveBs',
+                data    : $scope.bs
+            }), function(){
+            });
+        };
+
+        $scope.toggleGsAction = function(host){
+            var ix;
+
+            ix = $scope.gs.indexOf(host);
+
+            if (ix > -1) {
+                $scope.gs.splice(ix, 1);
+            }
+            else {
+                $scope.gs.push(host);
+            }
+
+            chrome.extension.sendRequest(null, ({
+                request : 'saveGs',
+                data    : $scope.gs
             }), function(){
             });
         };
@@ -57,7 +78,8 @@ angular.module('enoughApp', [])
             chrome.extension.sendRequest(null, 'getData', function(response){
                 $scope.total = 0;
                 $scope.data = response.data;
-                $scope.selection = response.selection;
+                $scope.bs = response.bs;
+                $scope.gs = response.gs;
 
                 angular.forEach(response.data, function(list){
                     angular.forEach(list, function(item){

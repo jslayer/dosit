@@ -17,8 +17,12 @@ chrome.storage.sync.get('data', function(v_data){
         v_data.data = {};
     }
 
-    if (!v_data.selection) {
-        v_data.selection = [];
+    if (!v_data.bs) {
+        v_data.bs = [];
+    }
+
+    if (!v_data.gs) {
+        v_data.gs = [];
     }
 
     setInterval(function(){
@@ -49,10 +53,9 @@ chrome.storage.sync.get('data', function(v_data){
                         }
 
                         chrome.browserAction.setIcon({
-                            path  : v_data.selection.indexOf(host) > -1 ? 'icon128_4.png' : 'icon128.png',
+                            path  : v_data.bs.indexOf(host) > -1 ? 'icon128_4.png' : 'icon128.png',
                             tabId : tab.id
                         }, function(){
-                            console.log('icon changed', tab.id, host, v_data.selection);
                         });
                     }
                 });
@@ -72,8 +75,9 @@ chrome.storage.sync.get('data', function(v_data){
                 case 'clearData':
                     chrome.storage.sync.clear(function(){
                         v_data = {
-                            data      : {},
-                            selection : []
+                            data : {},
+                            bs   : [],
+                            gs   : []
                         };
                         sendResponse('ok');
                     });
@@ -81,8 +85,13 @@ chrome.storage.sync.get('data', function(v_data){
                 default :
                     if (request && request.request && request.data) {
                         switch (request.request) {
-                            case 'saveSelection':
-                                v_data.selection = request.data;
+                            case 'saveBs':
+                                v_data.bs = request.data;
+                                saveData(v_data);
+                                break;
+
+                            case 'saveGs':
+                                v_data.gs = request.data;
                                 saveData(v_data);
                                 break;
                         }
