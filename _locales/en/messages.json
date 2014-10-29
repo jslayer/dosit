@@ -6,7 +6,7 @@
     "appDescription": {
         "message": "Time management application"
     },
-    "pageActionTitle" : {
+    "browserActionTitle" : {
         "message" : "Dosit'"
     }
 }

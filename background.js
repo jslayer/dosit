@@ -1,9 +1,10 @@
 function getToday(){
-    var a = new Date;
+    var a, b;
 
-    var b = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+    a = new Date;
+    b = new Date(a.getFullYear(), a.getMonth(), a.getDate());
 
-    return [b.getDate(), b.getMonth(), b.getFullYear()].join('.')
+    return b.getTime();
 }
 
 function saveData(data) {

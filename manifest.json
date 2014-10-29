@@ -11,8 +11,10 @@
     "permissions"      : [
         "storage", "tabs", "<all_urls>"
     ],
-    "page_action"      : {
-        "default_title" : "__MSG_pageActionTitle__"
+    "browser_action": {
+        "default_icon": "icon128.png",
+        "default_title": "__MSG_browserActionTitle__",
+        "default_popup": "browser_action_popup.html"
     },
     "content_scripts"  : [
         {
