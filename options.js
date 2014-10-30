@@ -26,7 +26,7 @@ angular.module('enoughApp', [])
         $scope.bs = [];
         $scope.gs = [];
         $scope.used = 0;
-        $scope.total = 0;
+        $scope.total_bad = 0;
 
         $scope.clearAction = function(){
             $scope.data = {};
@@ -76,14 +76,16 @@ angular.module('enoughApp', [])
 
         $interval(function(){
             chrome.extension.sendRequest(null, 'getData', function(response){
-                $scope.total = 0;
+                $scope.total_bad = 0;
                 $scope.data = response.data;
                 $scope.bs = response.bs;
                 $scope.gs = response.gs;
 
                 angular.forEach(response.data, function(list){
-                    angular.forEach(list, function(item){
-                        $scope.total += item;
+                    angular.forEach(list, function(item, host){
+                        if ($scope.bs.indexOf(host) > -1) {
+                            $scope.total_bad += item;
+                        }
                     })
                 });
             });
