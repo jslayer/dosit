@@ -10,15 +10,45 @@
         }
 
         .value {
-            padding: 0 32px 0 32px;
-            line-height: 35px;
+            padding: 0;
             background: rgba(00,00,00, 0.45);
             color: #fff;
             font-weight: bold;
             font-size:14px;
             text-align: center;
             border-radius: 4px 4px 0 0;
+            position: absolute;
+            left:0;
+            height:100%;
+            width:100%;
+            line-height:34px;
+        }
 
+        .app {
+            position: relative;
+            text-align: right;
+            padding-right: 2px;
+            height: 35px;
+        }
+
+        .app button {
+            width: 32px;
+            height:18px;
+            margin: 6px ;
+            border: none;
+            cursor: pointer;
+            text-indent: -9999px;
+            z-index:100;
+            position: relative;
+            border-radius: 2px;
+        }
+
+        .btn__allow {
+            background: rgba(36, 163, 6, 1);
+        }
+
+        .btn__deny {
+            background: #f00;
         }
 
         /*NA*/
@@ -48,10 +78,13 @@
 <script src="ui.js"></script>
 <script src="frame.js"></script>
 
-<div ng-app="FrameApp" ng-controller="MainCtrl">
+<div class="app" ng-app="FrameApp" ng-controller="MainCtrl">
     <div class="value" ng-class="['v__' + status]">
         {{c | dn}}
     </div>
+
+    <button ng-click="setStatus(SSS.ALLOW)" title="Allow" class="btn__allow" ng-if="status !== SSS.NA && status !== SSS.ALLOW">Allow</button>
+    <button ng-click="setStatus(SSS.DENY)" title="Deny" class="btn__deny" ng-if="status !== SSS.NA && status !== SSS.DENY">Deny</button>
 </div>
 </body>
 </html>
