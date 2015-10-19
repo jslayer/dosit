@@ -3,10 +3,10 @@ var data;
 angular.module('enoughApp', [])
     .filter('bytes', function(){
         return function(bytes, precision){
-            if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) {
+            if (isNaN(parseFloat(bytes)) || !isFinite(bytes)){
                 return '-';
             }
-            if (typeof precision === 'undefined') {
+            if (typeof precision === 'undefined'){
                 precision = 1;
             }
             var units = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'],
@@ -41,7 +41,7 @@ angular.module('enoughApp', [])
 
             ix = $scope.bs.indexOf(host);
 
-            if (ix > -1) {
+            if (ix > -1){
                 $scope.bs.splice(ix, 1);
             }
             else {
@@ -60,7 +60,7 @@ angular.module('enoughApp', [])
 
             ix = $scope.gs.indexOf(host);
 
-            if (ix > -1) {
+            if (ix > -1){
                 $scope.gs.splice(ix, 1);
             }
             else {
@@ -81,14 +81,31 @@ angular.module('enoughApp', [])
         function updateData(){
             chrome.extension.sendRequest(null, 'getData', function(response){
                 $scope.$apply(function(){
+                    var data;
+
                     $scope.total_bad = 0;
-                    $scope.data = response.data;
                     $scope.bs = response.bs;
                     $scope.gs = response.gs;
 
+                    data = {};
+
+                    angular.forEach(response.data, function(v, k){
+                        var idt = [];
+                        angular.forEach(v, function(value, host){
+                            idt.push({
+                                h : punycode.toUnicode(host),
+                                v : value
+                            });
+                        });
+
+                        data[k] = idt;
+                    });
+
+                    $scope.data = data;
+
                     angular.forEach(response.data, function(list){
                         angular.forEach(list, function(item, host){
-                            if ($scope.bs.indexOf(host) > -1) {
+                            if ($scope.bs.indexOf(host) > -1){
                                 $scope.total_bad += item;
                             }
                         })

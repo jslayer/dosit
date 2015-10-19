@@ -12,7 +12,7 @@ var Storage = (function(){
     cbs = [];
     asked = false;
 
-    return {
+    return obj = {
         isReady : function(){
             return ready;
         },
@@ -29,6 +29,10 @@ var Storage = (function(){
                 asked = true;
 
                 chrome.storage.sync.get('data', function(v_data){
+                    if (!v_data) {
+                        v_data = {};
+                    }
+
                     if (!v_data.data){
                         v_data.data = {};
                     }
