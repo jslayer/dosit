@@ -74,26 +74,33 @@ angular.module('enoughApp', [])
             });
         };
 
-        $interval(function(){
-            chrome.extension.sendRequest(null, 'getData', function(response){
-                $scope.total_bad = 0;
-                $scope.data = response.data;
-                $scope.bs = response.bs;
-                $scope.gs = response.gs;
+        $interval(updateData, 1000);
 
-                angular.forEach(response.data, function(list){
-                    angular.forEach(list, function(item, host){
-                        if ($scope.bs.indexOf(host) > -1) {
-                            $scope.total_bad += item;
-                        }
-                    })
+        updateData();
+
+        function updateData(){
+            chrome.extension.sendRequest(null, 'getData', function(response){
+                $scope.$apply(function(){
+                    $scope.total_bad = 0;
+                    $scope.data = response.data;
+                    $scope.bs = response.bs;
+                    $scope.gs = response.gs;
+
+                    angular.forEach(response.data, function(list){
+                        angular.forEach(list, function(item, host){
+                            if ($scope.bs.indexOf(host) > -1) {
+                                $scope.total_bad += item;
+                            }
+                        })
+                    });
                 });
             });
 
             chrome.storage.sync.getBytesInUse(function(used){
-                $scope.used = used;
+                $scope.$apply(function(){
+                    $scope.used = used;
+                });
             });
-
-        }, 1000);
+        }
 
     }]);

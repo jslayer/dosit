@@ -1,102 +1,177 @@
-function getToday(){
-    var a, b;
+function get_today(){
+    var a;
 
     a = new Date;
-    b = new Date(a.getFullYear(), a.getMonth(), a.getDate());
 
-    return b.getTime();
+    return (new Date(a.getFullYear(), a.getMonth(), a.getDate())).getTime();
 }
 
-function saveData(data){
-    chrome.storage.sync.set(data, function(){
-    });
-}
+var Storage = (function(){
+    var asked, data, cbs, obj, ready;
 
-chrome.storage.sync.get('data', function(v_data){
-    if (!v_data.data) {
-        v_data.data = {};
-    }
+    cbs = [];
+    asked = false;
 
-    if (!v_data.bs) {
-        v_data.bs = [];
-    }
+    return {
+        isReady : function(){
+            return ready;
+        },
 
-    if (!v_data.gs) {
-        v_data.gs = [];
-    }
+        getData : function(cb){
+            if (!ready){
+                cbs.push(cb);
+            }
+            else {
+                cb(data);
+            }
 
+            if (!asked){
+                asked = true;
+
+                chrome.storage.sync.get('data', function(v_data){
+                    if (!v_data.data){
+                        v_data.data = {};
+                    }
+
+                    if (!v_data.bs){
+                        v_data.bs = [];
+                    }
+
+                    if (!v_data.gs){
+                        v_data.gs = [];
+                    }
+
+                    Storage.setData(v_data);
+                });
+            }
+        },
+
+        setData : function(value){
+            data = value;
+
+            if (ready){
+                obj.saveData();
+            } else {
+                ready = true;
+
+                cbs.forEach(function(cb){
+                    cb(data);
+                });
+
+                cbs = [];
+            }
+        },
+
+        saveData : function(){
+            if (data){
+                chrome.storage.sync.set(data, function(){
+                });
+            }
+        }
+    };
+})();
+
+
+Storage.getData(function(data){
     setInterval(function(){
         chrome.tabs.query({
             active : true
         }, function(tabs){
 
-            tabs.forEach(function(tab){
-                chrome.tabs.sendMessage(tab.id, 'getFocus', function(response){
-                    var key, today, host, focus;
+            if (tabs.length > 0){
+                Storage.getData(function(data){
+                    tabs.forEach(function(tab){
+                        chrome.tabs.sendMessage(tab.id, 'getFocus', function(response){
+                            var key, today, host, focus;
 
-                    if (response) {
-                        host = response.host;
-                        focus = response.focus;
+                            if (response){
+                                host = response.host;
+                                focus = response.focus;
 
-                        if (focus) {
-                            today = getToday();
+                                if (focus){
+                                    today = get_today();
 
-                            if (!v_data.data[today]) {
-                                v_data.data[today] = {};
+                                    if (!data.data[today]){
+                                        data.data[today] = {};
+                                    }
+
+                                    if (!data.data[today][response.host]){
+                                        data.data[today][response.host] = 0;
+                                    }
+
+                                    data.data[today][response.host]++;
+                                }
+
+                                chrome.browserAction.setIcon({
+                                    path  : data.bs.indexOf(host) > -1 ? 'icon128_4.png' : 'icon128.png',
+                                    tabId : tab.id
+                                }, function(){
+                                });
                             }
 
-                            if (!v_data.data[today][response.host]) {
-                                v_data.data[today][response.host] = 0;
-                            }
-
-                            v_data.data[today][response.host]++;
-                        }
-
-                        chrome.browserAction.setIcon({
-                            path  : v_data.bs.indexOf(host) > -1 ? 'icon128_4.png' : 'icon128.png',
-                            tabId : tab.id
-                        }, function(){
                         });
-                    }
+                    })
                 });
-            });
+            }
         });
     }, 1000);
 
     setInterval(function(){
-        saveData(v_data);
+        Storage.saveData();
     }, 10000);
+});
 
-    chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
-            switch (request) {
-                case 'getData':
-                    sendResponse(v_data);
-                    break;
-                case 'clearData':
-                    chrome.storage.sync.clear(function(){
-                        v_data = {
-                            data : {},
-                            bs   : [],
-                            gs   : []
-                        };
-                        sendResponse('ok');
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
+        switch (request) {
+            case 'getData':
+                Storage.getData(function(data){
+                    sendResponse(data);
+                });
+                break;
+            case 'clearData':
+                chrome.storage.sync.clear(function(){
+                    Storage.setData({
+                        data : {},
+                        bs   : [],
+                        gs   : []
                     });
-                    break;
-                default :
-                    if (request && request.request && request.data) {
+                    sendResponse('ok');
+                });
+                break;
+            case 'getTodayData':
+                Storage.getData(function(data){
+                    var result, today;
+
+                    today = get_today();
+
+                    if (data && data.data && data.data[today]) {
+                        result = {
+                            today : data.data[today],
+                            data  : data
+                        };
+                    }
+
+                    sendResponse(result);
+                });
+                break;
+            default :
+                if (request && request.request && request.data){
+                    Storage.getData(function(data){
                         switch (request.request) {
                             case 'saveBs':
-                                v_data.bs = request.data;
-                                saveData(v_data);
+                                data.bs = request.data;
+                                Storage.setData(data);
+                                //saveData(v_data);
                                 break;
 
                             case 'saveGs':
-                                v_data.gs = request.data;
-                                saveData(v_data);
+                                data.gs = request.data;
+                                Storage.setData(data);
                                 break;
                         }
-                    }
-            }
+                    });
+                }
         }
-    );
-});
+    }
+);
+

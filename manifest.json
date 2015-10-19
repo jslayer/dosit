@@ -21,5 +21,8 @@
             "matches" : ["<all_urls>"],
             "js"      : ["content_script.js"]
         }
+    ],
+    "web_accessible_resources" : [
+        "frame.html"
     ]
 }
