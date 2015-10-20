@@ -131,9 +131,7 @@ angular.module('FrameApp', ['UI'])
                 _p = (_val - _val % MV[i]) / MV[i];
                 _val -= MV[i] * _p;
 
-                //if (_p > 0){
                 parts.push(_p < 10 ? '0' + _p : _p);
-                //}
             }
 
             return parts.join(' : ');

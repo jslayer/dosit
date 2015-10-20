@@ -26,7 +26,7 @@ angular.module('enoughApp', [])
         $scope.bs = [];
         $scope.gs = [];
         $scope.used = 0;
-        $scope.total_bad = 0;
+        $scope.totalBad = 0;
 
         $scope.clearAction = function(){
             $scope.data = {};
@@ -83,7 +83,8 @@ angular.module('enoughApp', [])
                 $scope.$apply(function(){
                     var data;
 
-                    $scope.total_bad = 0;
+                    $scope.totalBad = 0;
+                    $scope.total = 0;
                     $scope.bs = response.bs;
                     $scope.gs = response.gs;
 
@@ -109,8 +110,10 @@ angular.module('enoughApp', [])
                     angular.forEach(response.data, function(list){
                         angular.forEach(list, function(item, host){
                             if ($scope.bs.indexOf(host) > -1){
-                                $scope.total_bad += item;
+                                $scope.totalBad += item;
                             }
+
+                            $scope.total += item;
                         })
                     });
                 });
