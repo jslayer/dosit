@@ -87,7 +87,7 @@ angular.module('enoughApp', [])
                     $scope.bs = response.bs;
                     $scope.gs = response.gs;
 
-                    data = {};
+                    data = [];
 
                     angular.forEach(response.data, function(v, k){
                         var idt = [];
@@ -98,7 +98,10 @@ angular.module('enoughApp', [])
                             });
                         });
 
-                        data[k] = idt;
+                        data.push({
+                            date : k,
+                            items : idt
+                        });
                     });
 
                     $scope.data = data;

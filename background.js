@@ -172,6 +172,12 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
                                 data.gs = request.data;
                                 Storage.setData(data);
                                 break;
+
+                            case 'saveGBs':
+                                data.gs = request.data.gs;
+                                data.bs = request.data.bs;
+                                Storage.setData(data);
+                                break;
                         }
                     });
                 }

@@ -1,5 +1,4 @@
 //chrome.extension.sendRequest(null, 'getData', function(response){
-//    console.log(response);
 //    //$scope.total_bad = 0;
 //    //$scope.data = response.data;
 //    //$scope.bs = response.bs;
@@ -49,9 +48,7 @@ angular.module('FrameApp', ['UI'])
             chrome.extension.sendRequest(null, 'getTodayData', function(response){
                 var sns, _ixg, _ixb;
 
-                console.log(response);
-
-                if (response.data) {
+                if (response.data){
                     sns = {
                         gs : response.data.gs,
                         bs : response.data.bs
@@ -62,34 +59,37 @@ angular.module('FrameApp', ['UI'])
 
                     switch (status) {
                         case STATUSES.ALLOW:
-                            if (_ixg === -1) {
+                            if (_ixg === -1){
                                 sns.gs.push(host);
                             }
-                            if(_ixb !== -1) {
+                            if (_ixb !== -1){
                                 sns.bs.splice(_ixb, 1);
                             }
                             break;
                         case STATUSES.DENY:
-                            if (_ixb === -1) {
+                            if (_ixb === -1){
                                 sns.bs.push(host);
                             }
-                            if(_ixg !== -1) {
+                            if (_ixg !== -1){
                                 sns.gs.splice(_ixb, 1);
                             }
                             break;
                     }
 
                     chrome.extension.sendRequest(null, ({
-                        request : 'saveBs',
-                        data    : sns.bs
+                        request : 'saveGBs',
+                        data    : {
+                            bs : sns.bs,
+                            gs : sns.gs
+                        }
                     }), function(){
                     });
-
-                    chrome.extension.sendRequest(null, ({
-                        request : 'saveGs',
-                        data    : sns.gs
-                    }), function(){
-                    });
+                    //
+                    //chrome.extension.sendRequest(null, ({
+                    //    request : 'saveGs',
+                    //    data    : sns.gs
+                    //}), function(){
+                    //});
 
                     $s.$apply(function(){
                         $s.status = status;
@@ -102,7 +102,7 @@ angular.module('FrameApp', ['UI'])
             chrome.extension.sendRequest(null, 'getTodayData', function(response){
                 if (response && response.today){
                     $s.$apply(function(){
-                        switch(true) {
+                        switch (true) {
                             case response.data.gs.indexOf(host) > -1:
                                 $s.status = STATUSES.ALLOW;
                                 break;
