@@ -1,5 +1,4 @@
 /*
- *
  * Storage
  *
  * d : {uid:[domain, value, status]}
@@ -105,8 +104,6 @@ var Storage = (function(){
         incHost : function(host, date){
             var uid;
 
-            console.log(arguments, 'INC');
-
             uid = obj.getUid(host);
 
             if (!data.val[date]){
@@ -129,22 +126,39 @@ var Storage = (function(){
         },
 
         getByDay : function(host, date){
-            var uid = obj.getUid(host);
+            var uid;
 
-            var status = obj.getStatus(host);
-
-            console.log(arguments, uid, status);
-
-            var day = data.val[date] && data.val[date][uid] ? data.val[date][uid] : false;
+            uid = obj.getUid(host);
 
             return {
-                status : status,
-                data   : day
+                status : data.domains[obj.getUid(host)][1],
+                data   : data.val[date] && data.val[date][uid] ? data.val[date][uid] : false
             }
         },
 
+        getAllByDay : function(date){
+            var day, rse, uid, host;
+
+            day = data.val[date];
+
+            if (day) {
+                rse = [];
+
+                for(uid in day) {
+                    if (day.hasOwnProperty(uid)){
+                        rse.push({
+                            h : host = data.domains[uid][0],
+                            s : host = data.domains[uid][1],
+                            v : day[uid]
+                        });
+                    }
+                }
+            }
+
+            return rse;
+        },
+
         setData : function(value){
-            //console.log('set data');
             data = value;
 
             if (ready){
@@ -196,11 +210,6 @@ Storage.getData(function(data){
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
         switch (request) {
-            //case 'getData':
-            //    Storage.getData(function(data){
-            //        sendResponse(data);
-            //    });
-            //    break;
             case 'clearData':
                 chrome.storage.sync.clear(function(){
                     Storage.setData({
@@ -211,58 +220,26 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
                     sendResponse('ok');
                 });
                 break;
-            case 'getHostToday':
-                console.log(request);
-                break;
-            //case 'getTodayData':
-            //    Storage.getData(function(data){
-            //        var result, today;
-            //
-            //        today = get_today();
-            //
-            //        if (data && data.val && data.val[today]) {
-            //            result = {
-            //                today : data.val[today],
-            //                data  : data
-            //            };
-            //        }
-            //
-            //        sendResponse(result);
-            //    });
-            //    break;
             default :
                 if (request){
                     switch (request.type) {
-                        case 'getTodayData':
+                        case 'getTodayByHost':
                             var bd = Storage.getByDay(request.host, get_today());
                             sendResponse(bd);
                             break;
-                        default:
-                            if (request.request && request.data){
-                                Storage.getData(function(data){
-                                    switch (request.request) {
-                                        case 'saveBs':
-                                            data.bs = request.data;
-                                            Storage.setData(data);
-                                            //saveData(v_data);
-                                            break;
+                        case 'getToday':
+                            var td = get_today();
 
-                                        case 'saveGs':
-                                            data.gs = request.data;
-                                            Storage.setData(data);
-                                            break;
-
-                                        case 'saveGBs':
-                                            data.gs = request.data.gs;
-                                            data.bs = request.data.bs;
-                                            Storage.setData(data);
-                                            break;
-                                    }
-                                });
-                            }
-
+                            sendResponse({
+                                data : Storage.getAllByDay(td),
+                                date : td
+                            });
+                            break;
+                        case 'setStatus':
+                            Storage.setStatus(request.host, request.status);
+                            sendResponse(true);
+                            break;
                     }
-                    ;
                 }
         }
     }

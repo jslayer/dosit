@@ -1,4 +1,12 @@
-var data;
+//var data;
+
+var STATUSES = {
+    NA      : 0,
+    UNKNOWN : 1,
+    DENY    : 2,
+    ALLOW   : 3
+};
+
 
 angular.module('enoughApp', [])
     .filter('bytes', function(){
@@ -21,55 +29,27 @@ angular.module('enoughApp', [])
             });
         }
     })
-    .controller('EnoughController', ['$scope', '$interval', function($scope, $interval){
-        $scope.data = {};
-        $scope.bs = [];
-        $scope.gs = [];
-        $scope.used = 0;
-        $scope.totalBad = 0;
+    .controller('EnoughController', ['$scope', '$interval', function($s, $interval){
+        $s.data = {};
+        $s.bs = [];
+        $s.gs = [];
+        $s.used = 0;
+        $s.SSS = STATUSES;
+        $s.totalBad = 0;
 
-        $scope.clearAction = function(){
-            $scope.data = {};
-            $scope.bs = {};
-            $scope.gs = {};
+        $s.clearAction = function(){
+            $s.data = {};
+            $s.bs = {};
+            $s.gs = {};
             chrome.extension.sendRequest(null, 'clearData', function(response){
             });
         };
 
-        $scope.toggleBsAction = function(host){
-            var ix;
-
-            ix = $scope.bs.indexOf(host);
-
-            if (ix > -1){
-                $scope.bs.splice(ix, 1);
-            }
-            else {
-                $scope.bs.push(host);
-            }
-
+        $s.setStatus = function(item, status){
             chrome.extension.sendRequest(null, ({
-                request : 'saveBs',
-                data    : $scope.bs
-            }), function(){
-            });
-        };
-
-        $scope.toggleGsAction = function(host){
-            var ix;
-
-            ix = $scope.gs.indexOf(host);
-
-            if (ix > -1){
-                $scope.gs.splice(ix, 1);
-            }
-            else {
-                $scope.gs.push(host);
-            }
-
-            chrome.extension.sendRequest(null, ({
-                request : 'saveGs',
-                data    : $scope.gs
+                type : 'setStatus',
+                host : item.h,
+                status : status
             }), function(){
             });
         };
@@ -79,51 +59,32 @@ angular.module('enoughApp', [])
         updateData();
 
         function updateData(){
-            chrome.extension.sendRequest(null, 'getData', function(response){
-                $scope.$apply(function(){
+            chrome.extension.sendRequest(null, {
+                type : 'getToday'
+            }, function(response){
+                $s.$apply(function(){
                     var data;
 
-                    $scope.totalBad = 0;
-                    $scope.total = 0;
-                    $scope.bs = response.bs;
-                    $scope.gs = response.gs;
+                    $s.totalBad = 0;
+                    $s.total = 0;
 
-                    data = [];
+                    $s.data = response.data;
+                    $s.date = response.date;
 
-                    angular.forEach(response.data, function(v, k){
-                        var idt = [];
-                        angular.forEach(v, function(value, host){
-                            idt.push({
-                                h : punycode.toUnicode(host),
-                                v : value
-                            });
-                        });
+                    angular.forEach(response.data, function(item){
+                        if (item.s === STATUSES.DENY) {
+                            $s.totalBad += item.v;
+                        }
 
-                        data.push({
-                            date : k,
-                            items : idt
-                        });
-                    });
-
-                    $scope.data = data;
-
-                    angular.forEach(response.data, function(list){
-                        angular.forEach(list, function(item, host){
-                            if ($scope.bs.indexOf(host) > -1){
-                                $scope.totalBad += item;
-                            }
-
-                            $scope.total += item;
-                        })
+                        $s.total += item.v;
                     });
                 });
             });
 
             chrome.storage.sync.getBytesInUse(function(used){
-                $scope.$apply(function(){
-                    $scope.used = used;
+                $s.$apply(function(){
+                    $s.used = used;
                 });
             });
         }
-
     }]);

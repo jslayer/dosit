@@ -45,7 +45,7 @@ angular.module('FrameApp', ['UI'])
         $s.status = STATUSES.NA;
 
         $s.setStatus = function(status){
-            //chrome.extension.sendRequest(null, 'getTodayData', function(response){
+            //chrome.extension.sendRequest(null, 'getTodayByHost', function(response){
             //    var sns, _ixg, _ixb;
             //
             //    if (response.data){
@@ -98,17 +98,29 @@ angular.module('FrameApp', ['UI'])
             //});
         };
 
+        $s.setStatus = function(status){
+            chrome.extension.sendRequest(null, ({
+                type : 'setStatus',
+                host : host,
+                status : status
+            }), function(){
+                $s.$apply(function(){
+                    $s.status = status;
+                });
+            });
+        };
+
         $i(function(){
             chrome.extension.sendRequest(null, {
-                type : 'getTodayData',
-                host : get_host()
+                type : 'getTodayByHost',
+                host : host
             }, function(response){
                 $s.$apply(function(){
                     $s.status = response.status;
                     $s.c = response.data || 0;
                 });
             });
-            //chrome.extension.sendRequest(null, 'getTodayData', function(response){
+            //chrome.extension.sendRequest(null, 'getTodayByHost', function(response){
             //    if (response && response.today){
             //        $s.$apply(function(){
             //            switch (true) {

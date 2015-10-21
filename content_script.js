@@ -44,9 +44,6 @@ document.body.appendChild((function(){
 
     w.appendChild(f);
 
-    //w.innerHTML = 'ioioioioioioi';
-    //w.innerHTML = 'ioioioioioioi';
-
     return w;
 })());
 

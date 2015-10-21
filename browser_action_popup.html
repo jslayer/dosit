@@ -72,19 +72,25 @@
 <button type="button" ng-click="clearAction()">Clear</button>
 <!--<div>{{used | bytes}}</div>-->
 
-<h3>Total bad: {{totalBad | duration}} / ({{(100 * totalBad / total) | number : 0}}%) / {{used}} bytes</h3>
+<h3>{{date | date : 'd MMMM yyyy'}}</h3>
 
-<table ng-repeat="di in data | orderBy : '-date'">
+<!--<pre>-->
+    <!--{{data | json}}-->
+<!--</pre>-->
+
+<table _removed_ng-repeat="di in data | orderBy : '-date'">
     <tr>
         <th class="good">Good</th>
         <th class="bad">Bad</th>
-        <th colspan="2">{{di.date | date : 'd MMMM yyyy'}}</th>
+        <th colspan="2">
+            Bad: {{totalBad | duration}} / {{(100 * totalBad / total) | number : 0}}% / {{used}} bytes
+        </th>
     </tr>
-    <tr ng-repeat="item in di.items | orderBy : '-v'" ng-class="(bs.indexOf(item.h) > -1 && 'bs') || (gs.indexOf(item.h) > -1 && 'gs')">
-        <td><input type="checkbox" ng-checked="gs.indexOf(item.h) > -1" ng-click="toggleGsAction(item.h)" /></td>
-        <td><input type="checkbox" ng-checked="bs.indexOf(item.h) > -1" ng-click="toggleBsAction(item.h)" /></td>
-        <td class="host"><a ng-href="item.h">{{item.h}}</a></td>
-        <td ng-attr-title="{{item.v}}">{{item.v | duration}}</td>
+    <tr ng-repeat="item in data" ng-class="{gs : item.s === SSS.ALLOW, bs: item.s === SSS.DENY}">
+        <td><input type="radio" ng-model="item['s']" ng-value="SSS.ALLOW" ng-change="setStatus(item, SSS.ALLOW)" /></td>
+        <td><input type="radio" ng-model="item['s']" ng-value="SSS.DENY" ng-change="setStatus(item, SSS.DENY)" /></td>
+        <td class="host"><a ng-href="{{'http://' + item.h}}">{{item.h}}</a></td>
+        <td>{{item.v | duration}}</td>
     </tr>
 </table>
 
