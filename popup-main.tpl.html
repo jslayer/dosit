@@ -11,7 +11,7 @@
     <tr ng-repeat="item in data | orderBy : '-v'" ng-class="{gs : item.s === SSS.ALLOW, bs: item.s === SSS.DENY}">
         <td><input type="radio" ng-model="item['s']" ng-value="SSS.ALLOW" ng-change="setStatus(item, SSS.ALLOW)" /></td>
         <td><input type="radio" ng-model="item['s']" ng-value="SSS.DENY" ng-change="setStatus(item, SSS.DENY)" /></td>
-        <td class="host"><a ng-href="{{'http://' + item.h}}">{{item.h}}</a></td>
+        <td class="host"><a ng-href="{{'http://' + item.h}}">{{item.h | host}}</a></td>
         <td>{{item.v | duration}}</td>
     </tr>
 </table>

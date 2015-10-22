@@ -29,6 +29,11 @@ angular.module('enoughApp', ['ngRoute'])
             });
         }
     })
+    .filter('host', function(){
+        return function(value) {
+            return punycode.toUnicode(value);
+        }
+    })
     .controller('MainCtrl', ['$scope', '$interval', function($s, $interval){
         $s.data = {};
         $s.bs = [];
