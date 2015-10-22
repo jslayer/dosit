@@ -8,7 +8,7 @@ var STATUSES = {
 };
 
 
-angular.module('enoughApp', [])
+angular.module('enoughApp', ['ngRoute'])
     .filter('bytes', function(){
         return function(bytes, precision){
             if (isNaN(parseFloat(bytes)) || !isFinite(bytes)){
@@ -29,7 +29,7 @@ angular.module('enoughApp', [])
             });
         }
     })
-    .controller('EnoughController', ['$scope', '$interval', function($s, $interval){
+    .controller('MainCtrl', ['$scope', '$interval', function($s, $interval){
         $s.data = {};
         $s.bs = [];
         $s.gs = [];
@@ -87,4 +87,28 @@ angular.module('enoughApp', [])
                 });
             });
         }
-    }]);
+    }])
+    .config([
+        '$routeProvider', '$locationProvider',
+        function($rp, $lp){
+            $rp
+                .when('/', {
+                    controller  : 'MainCtrl',
+                    templateUrl : 'popup-main.tpl.html'
+                })
+                .when('/week', {
+                    controller  : 'MainCtrl',
+                    templateUrl : 'popup-week.tpl.html'
+                })
+                .otherwise({
+                    redirectTo : '/'
+                });
+
+            $lp.html5Mode(true);
+
+            //$lp.html5Mode({
+                //enabled : true,
+                //requireBase : false
+            //});
+        }
+    ]);

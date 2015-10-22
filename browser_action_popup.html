@@ -65,34 +65,23 @@
     </style>
     <script src="humanize-duration.js"></script>
     <script src="angular.min.js"></script>
+    <script src="angular-route.min.js"></script>
     <script src="options.js"></script>
     <script src="punycode.js"></script>
+
+    <base href="/"/>
 </head>
-<body ng-controller="EnoughController">
+<body>
+
+<div class="nav">
+    <ul class="nav">
+        <li><a href="/">День</a></li>
+        <li><a href="week">Неделя</a></li>
+    </ul>
+</div>
+
 <button type="button" ng-click="clearAction()">Clear</button>
-<!--<div>{{used | bytes}}</div>-->
 
-<h3>{{date | date : 'd MMMM yyyy'}}</h3>
-
-<!--<pre>-->
-    <!--{{data | json}}-->
-<!--</pre>-->
-
-<table _removed_ng-repeat="di in data | orderBy : '-date'">
-    <tr>
-        <th class="good">Good</th>
-        <th class="bad">Bad</th>
-        <th colspan="2">
-            Bad: {{totalBad | duration}} / {{(100 * totalBad / total) | number : 0}}% / {{used}} bytes
-        </th>
-    </tr>
-    <tr ng-repeat="item in data" ng-class="{gs : item.s === SSS.ALLOW, bs: item.s === SSS.DENY}">
-        <td><input type="radio" ng-model="item['s']" ng-value="SSS.ALLOW" ng-change="setStatus(item, SSS.ALLOW)" /></td>
-        <td><input type="radio" ng-model="item['s']" ng-value="SSS.DENY" ng-change="setStatus(item, SSS.DENY)" /></td>
-        <td class="host"><a ng-href="{{'http://' + item.h}}">{{item.h}}</a></td>
-        <td>{{item.v | duration}}</td>
-    </tr>
-</table>
-
+<div ng-view></div>
 </body>
 </html>

@@ -1,0 +1,17 @@
+<h3>{{date | date : 'd MMMM yyyy'}}</h3>
+
+<table>
+    <tr>
+        <th class="good">Good</th>
+        <th class="bad">Bad</th>
+        <th colspan="2">
+            Bad: {{totalBad | duration}} / {{(100 * totalBad / total) | number : 0}}% / {{used}} bytes
+        </th>
+    </tr>
+    <tr ng-repeat="item in data | orderBy : '-v'" ng-class="{gs : item.s === SSS.ALLOW, bs: item.s === SSS.DENY}">
+        <td><input type="radio" ng-model="item['s']" ng-value="SSS.ALLOW" ng-change="setStatus(item, SSS.ALLOW)" /></td>
+        <td><input type="radio" ng-model="item['s']" ng-value="SSS.DENY" ng-change="setStatus(item, SSS.DENY)" /></td>
+        <td class="host"><a ng-href="{{'http://' + item.h}}">{{item.h}}</a></td>
+        <td>{{item.v | duration}}</td>
+    </tr>
+</table>
