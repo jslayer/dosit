@@ -9,7 +9,6 @@
  *    domains : {
  *        55 : ['chrome.com' : 2]
  *    },
- *    data : {
  *        DDMMYYYY : {
  *            55 : 2
  *        }
@@ -58,19 +57,19 @@ var Storage = (function(){
                 asked = true;
 
                 chrome.storage.sync.get('data', function(v_data){
-                    if (!v_data) {
+                    if (!v_data){
                         v_data = {};
                     }
 
-                    if (!v_data.domains) {
+                    if (!v_data.domains){
                         v_data.domains = {};
                     }
 
-                    if (typeof v_data.uid !== 'number') {
+                    if (typeof v_data.uid !== 'number'){
                         v_data.uid = 0;
                     }
 
-                    if (!v_data.val) {
+                    if (!v_data.val){
                         v_data.val = {};
                     }
 
@@ -125,6 +124,23 @@ var Storage = (function(){
             return data.domains[obj.getUid(host)][1];
         },
 
+        removeHost : function(host){
+            var ix, i, i1;
+
+            for (i in data.domains) {
+                if (data.domains.hasOwnProperty(i) && data.domains[i][0] === host){
+                    delete data.domains[i];
+
+                    for (i1 in data.val) {
+                        if (data.val.hasOwnProperty(i1)){
+                            delete data.val[i1][i];
+                        }
+                    }
+                    break;
+                }
+            }
+        },
+
         getByDay : function(host, date){
             var uid;
 
@@ -141,10 +157,10 @@ var Storage = (function(){
 
             day = data.val[date];
 
-            if (day) {
+            if (day){
                 rse = [];
 
-                for(uid in day) {
+                for (uid in day) {
                     if (day.hasOwnProperty(uid)){
                         rse.push({
                             h : host = data.domains[uid][0],
@@ -214,7 +230,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
                 chrome.storage.sync.clear(function(){
                     Storage.setData({
                         domains : {},
-                        val    : {},
+                        val     : {},
                         uid     : 0
                     });
                     sendResponse('ok');
@@ -227,6 +243,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
                             var bd = Storage.getByDay(request.host, get_today());
                             sendResponse(bd);
                             break;
+
                         case 'getToday':
                             var td = get_today();
 
@@ -235,8 +252,14 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
                                 date : td
                             });
                             break;
+
                         case 'setStatus':
                             Storage.setStatus(request.host, request.status);
+                            sendResponse(true);
+                            break;
+
+                        case 'removeHost':
+                            Storage.removeHost(request.host);
                             sendResponse(true);
                             break;
                     }

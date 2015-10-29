@@ -51,11 +51,20 @@ angular.module('enoughApp', ['ngRoute'])
         };
 
         $s.setStatus = function(item, status){
-            chrome.extension.sendRequest(null, ({
+            chrome.extension.sendRequest(null, {
                 type : 'setStatus',
                 host : item.h,
                 status : status
-            }), function(){
+            }, function(){
+            });
+        };
+
+        $s.remove = function(host){
+            chrome.extension.sendRequest(null, {
+                type : 'removeHost',
+                host : host
+            }, function(){
+                $s.$apply();
             });
         };
 
