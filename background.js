@@ -94,7 +94,7 @@ var Storage = (function(){
 
             if (uid === false){
                 uid = data.uid++;
-                data.domains[uid] = [host, STATUSES.DENY];
+                data.domains[uid] = [host, STATUSES.UNKNOWN];
             }
 
             return uid;
