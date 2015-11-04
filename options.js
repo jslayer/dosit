@@ -40,7 +40,7 @@ angular.module('enoughApp', ['ngRoute'])
         $s.gs = [];
         $s.used = 0;
         $s.SSS = STATUSES;
-        $s.totalBad = 0;
+        $s.totalGood = 0;
 
         $s.clearAction = function(){
             $s.data = {};
@@ -79,15 +79,15 @@ angular.module('enoughApp', ['ngRoute'])
                 $s.$apply(function(){
                     var data;
 
-                    $s.totalBad = 0;
+                    $s.totalGood = 0;
                     $s.total = 0;
 
                     $s.data = response.data;
                     $s.date = response.date;
 
                     angular.forEach(response.data, function(item){
-                        if (item.s === STATUSES.DENY) {
-                            $s.totalBad += item.v;
+                        if (item.s === STATUSES.ALLOW) {
+                            $s.totalGood += item.v;
                         }
 
                         $s.total += item.v;
